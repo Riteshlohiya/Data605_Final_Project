@@ -1,0 +1,10 @@
+---
+title: "RLohiya Final Project"
+author: "Ritesh Lohiya"
+date: "December 7, 2018"
+output: html_document
+---
+
+#                             FINAL PROJECT
+
+#           IS 605 FUNDAMENTALS OF COMPUTATIONAL MATHEMATICS
