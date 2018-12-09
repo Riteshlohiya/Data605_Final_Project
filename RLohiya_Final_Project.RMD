@@ -8,3 +8,37 @@ output: html_document
 #                             FINAL PROJECT
 
 #           IS 605 FUNDAMENTALS OF COMPUTATIONAL MATHEMATICS
+
+
+```{r}
+
+#download the files and then load them from storage
+F1 <- read.csv("https://raw.githubusercontent.com/Riteshlohiya/Data605_Final_Project/master/F1.csv", stringsAsFactors = FALSE)
+F1
+
+#define X and Y.  
+X <- F1$X1
+Y <- F1$Y1
+```
+
+
+#Probability.
+
+Calculate as a minimum the below probabilities a through c. Assume the small letter "x" is estimated as the 1st quartile of the X variable, and the small letter "y" is estimated as the 2d quartile of the Y variable. Interpret the meaning of all probabilities.
+
+```{r}
+# get quartiles
+summary(X)
+```
+
+```{r}
+x <- summary(X)[2]
+x
+```
+
+
+```{r}
+summary(Y)
+y <- summary(Y)[3]
+y
+```
