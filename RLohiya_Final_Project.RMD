@@ -24,21 +24,129 @@ Y <- F1$Y1
 
 #Probability.
 
-Calculate as a minimum the below probabilities a through c. Assume the small letter "x" is estimated as the 1st quartile of the X variable, and the small letter "y" is estimated as the 2d quartile of the Y variable. Interpret the meaning of all probabilities.
+Calculate as a minimum the below probabilities a through c.  Assume the small letter "x" is estimated as the 3d quartile of the X variable, and the small letter "y" is estimated as the 1st quartile of the Y variable.  Interpret the meaning of all probabilities.
 
 ```{r}
 # get quartiles
+#"x" is 3d quartile of X variable
+#"y" is 2d quartile of X variable
 summary(X)
-```
-
-```{r}
-x <- summary(X)[2]
-x
-```
-
-
-```{r}
 summary(Y)
-y <- summary(Y)[3]
-y
 ```
+
+The 3rd quartile of the X variable = 15.82 The 1st quartile of the Y variable = 18.55 So, x = 15.82 and y = 18.55
+
+```{r}
+x <- 15.82
+y <- 18.55
+```
+
+```{r}
+df<-data.frame(cbind(X,Y))
+```
+
+```{r}
+PA_and_B <- nrow(subset(df, X > x & Y > y))/nrow(df)
+PA <- nrow(subset(df, X > x))/nrow(df)
+PB <- nrow(subset(df, Y > y))/nrow(df)
+PC <- nrow(subset(df, X < x))/nrow(df)
+PC_and_B <- nrow(subset(df, X < x & Y > y))/nrow(df)
+```
+
+# a. P(X>x | Y>y)
+
+```{r}
+# a. P(X>x | Y>y)
+pA_given_B <- PA_and_B/PB
+pA_given_B
+```
+
+P(X>x | Y>y) = .2 or 20%, which means that there is 20% probablity of X>x or X will be greater than than it 3rd quartile value of 15.82 given that the Y is greater than its 1st quartile value of 18.55.
+
+# b. P(X>x, Y>y)
+
+```{r}
+# b. P(X>x, Y>y)
+PA_and_B
+```
+
+P(X>x, Y>y) = .15 or 15%, which means that there is 15% probablity of X>x or X will be greater than than it 3rd quartile value of 15.82 while Y is greater than its 1st quartile value of 18.55.
+
+# c. P(X < x | Y>y)
+
+```{r}
+# c. P(X<x|Y>y)
+PC_given_B <- PC_and_B/PB
+PC_given_B
+```
+
+P(X < x|Y>y) = .8 or 80%, which means that there is 80% probablity of X < x or X will be smaller than than it 3rd quartile value of 15.82 given that the Y is greater than its 1st quartile value of 18.55.
+
+
+
+# Table of Counts
+
+
+```{r}
+data_tbl <- as.data.frame(cbind.data.frame(X, Y, t1 = ifelse(X > 
+    x, ">1st quartile", "<=1st quartile"), Total = ifelse(Y > y, ">3d quartile", 
+    "<=3d quartile")))
+
+tbl <- addmargins(table(data_tbl$t1, data_tbl$Total, dnn = c("X/Y")))
+tbl
+```
+
+#Does splitting the training data in this fashion make them independent? Let A be the new variable counting those observations above the 1st quartile for X, and let B be the new variable counting those observations above the 1st quartile for Y.    Does P(AB)=P(A)P(B)?   Check mathematically, and then evaluate by running a Chi Square test for association.
+
+#Mathematical test:
+
+```{r}
+A <- tbl[2, 3]
+A
+```
+
+```{r}
+B <- tbl[3, 2]
+B
+```
+
+```{r}
+total <- tbl[3, 3]
+total
+```
+
+
+```{r}
+A_AND_B <- tbl[2, 2]
+
+# P(A)
+PA <- A/total
+
+# P(B)
+PB <- B/total
+
+# P(A INT B)
+PA_INT_B <- A_AND_B/total
+
+
+# P(A|B) = P(A INT B) / P(B)
+
+PA_GIVEN_B <- PA_INT_B/PB
+
+# P(A) * P(B)
+
+PA_INTO_PB <- (PA * PB)
+
+PA_GIVEN_B
+
+PA_INTO_PB
+
+```
+
+#Chi Square test
+
+```{r}
+chisq.test(X,Y) 
+```
+
+we can see that P(A|B) is 0.2 and P(A) * P(B) is 0.1875. They are very near. Therefore splitting the training data in this manner is going to make them independent. Also from the Chisq test we can see that P-Value is .22, so we cannot reject the null hypothesis.

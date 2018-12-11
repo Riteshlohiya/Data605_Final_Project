@@ -160,22 +160,112 @@ Y &lt;- F1$Y1</code></pre>
 </div>
 <div id="probability." class="section level1">
 <h1>Probability.</h1>
-<p>Calculate as a minimum the below probabilities a through c. Assume the small letter “x” is estimated as the 1st quartile of the X variable, and the small letter “y” is estimated as the 2d quartile of the Y variable. Interpret the meaning of all probabilities.</p>
+<p>Calculate as a minimum the below probabilities a through c. Assume the small letter “x” is estimated as the 3d quartile of the X variable, and the small letter “y” is estimated as the 1st quartile of the Y variable. Interpret the meaning of all probabilities.</p>
 <pre class="r"><code># get quartiles
+#&quot;x&quot; is 3d quartile of X variable
+#&quot;y&quot; is 2d quartile of X variable
 summary(X)</code></pre>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ##    3.50    6.85    9.20   10.83   15.82   22.40</code></pre>
-<pre class="r"><code>x &lt;- summary(X)[2]
-x</code></pre>
-<pre><code>## 1st Qu. 
-##    6.85</code></pre>
 <pre class="r"><code>summary(Y)</code></pre>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ##   10.30   18.55   20.55   20.29   22.07   28.70</code></pre>
-<pre class="r"><code>y &lt;- summary(Y)[3]
-y</code></pre>
-<pre><code>## Median 
-##  20.55</code></pre>
+<p>The 3rd quartile of the X variable = 15.82 The 1st quartile of the Y variable = 18.55 So, x = 15.82 and y = 18.55</p>
+<pre class="r"><code>x &lt;- 15.82
+y &lt;- 18.55</code></pre>
+<pre class="r"><code>df&lt;-data.frame(cbind(X,Y))</code></pre>
+<pre class="r"><code>PA_and_B &lt;- nrow(subset(df, X &gt; x &amp; Y &gt; y))/nrow(df)
+PA &lt;- nrow(subset(df, X &gt; x))/nrow(df)
+PB &lt;- nrow(subset(df, Y &gt; y))/nrow(df)
+PC &lt;- nrow(subset(df, X &lt; x))/nrow(df)
+PC_and_B &lt;- nrow(subset(df, X &lt; x &amp; Y &gt; y))/nrow(df)</code></pre>
+</div>
+<div id="a.-pxx-yy" class="section level1">
+<h1>a. P(X&gt;x | Y&gt;y)</h1>
+<pre class="r"><code># a. P(X&gt;x | Y&gt;y)
+pA_given_B &lt;- PA_and_B/PB
+pA_given_B</code></pre>
+<pre><code>## [1] 0.2</code></pre>
+<p>P(X&gt;x | Y&gt;y) = .2 or 20%, which means that there is 20% probablity of X&gt;x or X will be greater than than it 3rd quartile value of 15.82 given that the Y is greater than its 1st quartile value of 18.55.</p>
+</div>
+<div id="b.-pxx-yy" class="section level1">
+<h1>b. P(X&gt;x, Y&gt;y)</h1>
+<pre class="r"><code># b. P(X&gt;x, Y&gt;y)
+PA_and_B</code></pre>
+<pre><code>## [1] 0.15</code></pre>
+<p>P(X&gt;x, Y&gt;y) = .15 or 15%, which means that there is 15% probablity of X&gt;x or X will be greater than than it 3rd quartile value of 15.82 while Y is greater than its 1st quartile value of 18.55.</p>
+</div>
+<div id="c.-px-x-yy" class="section level1">
+<h1>c. P(X &lt; x | Y&gt;y)</h1>
+<pre class="r"><code># c. P(X&lt;x|Y&gt;y)
+PC_given_B &lt;- PC_and_B/PB
+PC_given_B</code></pre>
+<pre><code>## [1] 0.8</code></pre>
+<p>P(X &lt; x|Y&gt;y) = .8 or 80%, which means that there is 80% probablity of X &lt; x or X will be smaller than than it 3rd quartile value of 15.82 given that the Y is greater than its 1st quartile value of 18.55.</p>
+</div>
+<div id="table-of-counts" class="section level1">
+<h1>Table of Counts</h1>
+<pre class="r"><code>data_tbl &lt;- as.data.frame(cbind.data.frame(X, Y, t1 = ifelse(X &gt; 
+    x, &quot;&gt;1st quartile&quot;, &quot;&lt;=1st quartile&quot;), Total = ifelse(Y &gt; y, &quot;&gt;3d quartile&quot;, 
+    &quot;&lt;=3d quartile&quot;)))
+
+tbl &lt;- addmargins(table(data_tbl$t1, data_tbl$Total, dnn = c(&quot;X/Y&quot;)))
+tbl</code></pre>
+<pre><code>##                 NA
+## X/Y              &lt;=3d quartile &gt;3d quartile Sum
+##   &lt;=1st quartile             3           12  15
+##   &gt;1st quartile              2            3   5
+##   Sum                        5           15  20</code></pre>
+</div>
+<div id="does-splitting-the-training-data-in-this-fashion-make-them-independent-let-a-be-the-new-variable-counting-those-observations-above-the-1st-quartile-for-x-and-let-b-be-the-new-variable-counting-those-observations-above-the-1st-quartile-for-y.-does-pabpapb-check-mathematically-and-then-evaluate-by-running-a-chi-square-test-for-association." class="section level1">
+<h1>Does splitting the training data in this fashion make them independent? Let A be the new variable counting those observations above the 1st quartile for X, and let B be the new variable counting those observations above the 1st quartile for Y. Does P(AB)=P(A)P(B)? Check mathematically, and then evaluate by running a Chi Square test for association.</h1>
+</div>
+<div id="mathematical-test" class="section level1">
+<h1>Mathematical test:</h1>
+<pre class="r"><code>A &lt;- tbl[2, 3]
+A</code></pre>
+<pre><code>## [1] 5</code></pre>
+<pre class="r"><code>B &lt;- tbl[3, 2]
+B</code></pre>
+<pre><code>## [1] 15</code></pre>
+<pre class="r"><code>total &lt;- tbl[3, 3]
+total</code></pre>
+<pre><code>## [1] 20</code></pre>
+<pre class="r"><code>A_AND_B &lt;- tbl[2, 2]
+
+# P(A)
+PA &lt;- A/total
+
+# P(B)
+PB &lt;- B/total
+
+# P(A INT B)
+PA_INT_B &lt;- A_AND_B/total
+
+
+# P(A|B) = P(A INT B) / P(B)
+
+PA_GIVEN_B &lt;- PA_INT_B/PB
+
+# P(A) * P(B)
+
+PA_INTO_PB &lt;- (PA * PB)
+
+PA_GIVEN_B</code></pre>
+<pre><code>## [1] 0.2</code></pre>
+<pre class="r"><code>PA_INTO_PB</code></pre>
+<pre><code>## [1] 0.1875</code></pre>
+</div>
+<div id="chi-square-test" class="section level1">
+<h1>Chi Square test</h1>
+<pre class="r"><code>chisq.test(X,Y) </code></pre>
+<pre><code>## Warning in chisq.test(X, Y): Chi-squared approximation may be incorrect</code></pre>
+<pre><code>## 
+##  Pearson's Chi-squared test
+## 
+## data:  X and Y
+## X-squared = 306.67, df = 289, p-value = 0.2272</code></pre>
+<p>we can see that P(A|B) is 0.2 and P(A) * P(B) is 0.1875. They are very near. Therefore splitting the training data in this manner is going to make them independent. Also from the Chisq test we can see that P-Value is .22, so we cannot reject the null hypothesis.</p>
 </div>
 
 
