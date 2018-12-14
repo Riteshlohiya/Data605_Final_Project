@@ -654,6 +654,48 @@ hist(train$YrSold, breaks = 100, col = 'blue')
 hist(train$SalePrice, breaks = 100, col = 'blue')
 ```
 
+##Derive a correlation matrix for any THREE quantitative variables in the dataset
 
+Selected variables are: SalePrice,TotalBsmtSF,GrLivArea
+
+```{r}
+train_cor <- train[c("SalePrice", "TotalBsmtSF", "GrLivArea")]
+train_cor_matrix <- cor(train_cor, use = "complete.obs")
+train_cor_matrix
+```
+
+The Matrix suggests that there are strong to moderate corelation exists between these three variables. 'Saleprice' has strong corelations with 'TotalBsmtSF' and 'GrLivArea' with corelation coefficients of .61 and .708 respectively while 'TotalBsmtSF' and 'GrLivArea' have moderate corelation between them with coefficient of .45.
+
+```{r}
+pairs.panels(train_cor_matrix)
+```
+
+##Corelation test bwteen each pair:
+
+Test between 'TotalBsmtSF' and 'SalePrice'
+
+```{r}
+cor.test(train$TotalBsmtSF, train$SalePrice, method = "pearson", conf.level = 0.80)
+```
+
+Test between 'GrLivArea' and 'SalePrice'
+
+```{r}
+cor.test(train$GrLivArea, train$SalePrice, method = "pearson", conf.level = 0.80)
+```
+
+Test between 'GrLivArea' and 'TotalBsmtSF'
+
+```{r}
+cor.test(train$GrLivArea, train$TotalBsmtSF, method = "pearson", conf.level = 0.80)
+```
+
+Since all three p-values are less than .05, the variables are significantly correlated.
+
+##Would you be worried about familywise error? Why or why not?
+
+Yes, there are variables in this dataset that might have impact on the corelation of the the pairs of selected variables that are being tested here. There is a scope for familywise error which might cause rejecting of true Null hypothesis.
+
+#Linear Algebra and Correlation:
 
 
