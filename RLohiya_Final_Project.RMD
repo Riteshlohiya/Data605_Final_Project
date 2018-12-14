@@ -9,6 +9,92 @@ output: html_document
 
 #           IS 605 FUNDAMENTALS OF COMPUTATIONAL MATHEMATICS
 
+#install.packages('bestglm')
+
+#install.packages('ggpubr')
+
+```{r}
+
+library(readr)
+
+library(kableExtra)
+
+library(tidyverse)
+
+library(knitr)
+
+library(psych)
+
+library(gridExtra)
+
+library(usdm)
+
+library(mice)
+
+library(ggiraph)
+
+library(cowplot)
+
+library(reshape2)
+
+library(corrgram)
+
+library(caTools)
+
+library(caret)
+
+library(ROCR)
+
+library(pROC)
+
+library(reshape2)
+
+library(Amelia)
+
+library(qqplotr)
+
+library(moments)
+
+library(car)
+
+library(MASS)
+
+library(geoR)
+
+library(xtable)
+
+library(plyr)
+
+library(Hmisc)
+
+library(corrplot)
+
+library(PerformanceAnalytics)
+
+library(ggpubr)
+
+library(matrixcalc)
+
+library(alr3)
+
+library(bestglm)
+
+library(car)
+
+
+library(gridExtra)
+
+
+
+library(scales)
+
+
+
+```
+
+#Problem 1
+
+##Pick one of the quantitative independent variables (Xi) from the data set below, and define that variable as  X.  Also, pick one of the dependent variables (Yi) below, and define that as Y.
 
 ```{r}
 
@@ -22,7 +108,7 @@ Y <- F1$Y1
 ```
 
 
-#Probability.
+##Probability.
 
 Calculate as a minimum the below probabilities a through c.  Assume the small letter "x" is estimated as the 3d quartile of the X variable, and the small letter "y" is estimated as the 1st quartile of the Y variable.  Interpret the meaning of all probabilities.
 
@@ -53,7 +139,7 @@ PC <- nrow(subset(df, X < x))/nrow(df)
 PC_and_B <- nrow(subset(df, X < x & Y > y))/nrow(df)
 ```
 
-# a. P(X>x | Y>y)
+## a. P(X>x | Y>y)
 
 ```{r}
 # a. P(X>x | Y>y)
@@ -63,7 +149,7 @@ pA_given_B
 
 P(X>x | Y>y) = .2 or 20%, which means that there is 20% probablity of X>x or X will be greater than than it 3rd quartile value of 15.82 given that the Y is greater than its 1st quartile value of 18.55.
 
-# b. P(X>x, Y>y)
+## b. P(X>x, Y>y)
 
 ```{r}
 # b. P(X>x, Y>y)
@@ -72,7 +158,7 @@ PA_and_B
 
 P(X>x, Y>y) = .15 or 15%, which means that there is 15% probablity of X>x or X will be greater than than it 3rd quartile value of 15.82 while Y is greater than its 1st quartile value of 18.55.
 
-# c. P(X < x | Y>y)
+## c. P(X < x | Y>y)
 
 ```{r}
 # c. P(X<x|Y>y)
@@ -84,7 +170,7 @@ P(X < x|Y>y) = .8 or 80%, which means that there is 80% probablity of X < x or X
 
 
 
-# Table of Counts
+## Table of Counts
 
 
 ```{r}
@@ -96,9 +182,9 @@ tbl <- addmargins(table(data_tbl$t1, data_tbl$Total, dnn = c("X/Y")))
 tbl
 ```
 
-#Does splitting the training data in this fashion make them independent? Let A be the new variable counting those observations above the 1st quartile for X, and let B be the new variable counting those observations above the 1st quartile for Y.    Does P(AB)=P(A)P(B)?   Check mathematically, and then evaluate by running a Chi Square test for association.
+##Does splitting the training data in this fashion make them independent? Let A be the new variable counting those observations above the 1st quartile for X, and let B be the new variable counting those observations above the 1st quartile for Y.    Does P(AB)=P(A)P(B)?   Check mathematically, and then evaluate by running a Chi Square test for association.
 
-#Mathematical test:
+##Mathematical test:
 
 ```{r}
 A <- tbl[2, 3]
@@ -143,10 +229,431 @@ PA_INTO_PB
 
 ```
 
-#Chi Square test
+##Chi Square test
 
 ```{r}
 chisq.test(X,Y) 
 ```
 
 we can see that P(A|B) is 0.2 and P(A) * P(B) is 0.1875. They are very near. Therefore splitting the training data in this manner is going to make them independent. Also from the Chisq test we can see that P-Value is .22, so we cannot reject the null hypothesis.
+
+
+#Problem 2
+
+##You are to register for Kaggle.com (free) and compete in the House Prices: Advanced Regression Techniques competition.  https://www.kaggle.com/c/house-prices-advanced-regression-techniques .  I want you to do the following.
+
+```{r}
+#download the train
+train <- read.csv("https://raw.githubusercontent.com/Riteshlohiya/Data605_Final_Project/master/train.csv", stringsAsFactors = FALSE)
+```
+
+##Descriptive and Inferential Statistics.
+
+Provide univariate descriptive statistics and appropriate plots for the training data set.  Provide a scatterplot matrix for at least two of the independent variables and the dependent variable. Derive a correlation matrix for any THREE quantitative variables in the dataset.  Test the hypotheses that the correlations between each pairwise set of variables is 0 and provide a 80% confidence interval.  Discuss the meaning of your analysis.  Would you be worried about familywise error? Why or why not?
+
+Subsetting the dataset to get only the numeric columns.
+
+
+First i will plot scatterplots for Gross living area and Sale price.
+
+```{r}
+ggplot(train, aes(x=GrLivArea, y=SalePrice)) + geom_jitter(color='seagreen4') + theme_classic() + 
+labs(title ='Scatter Plot of Gross living area vs Sale price') + theme(plot.title = element_text(hjust = 5000)) 
+```
+
+```{r}
+ggplot(train, aes(x=MasVnrArea, y=SalePrice)) + geom_jitter(color='seagreen4') + theme_classic() + 
+labs(title ='Scatter Plot of Masonry veneer area vs Sale price') + theme(plot.title = element_text(hjust = 5000)) 
+```
+
+From the above scatter plots we can see that there is some kind of relation between the independent and dependent variables.
+
+Lets now so some descriptive analysis on the available data.
+
+## Descriptive statistics and plots 
+
+```{r}
+num <- unlist(lapply(train, is.numeric))
+train_num <- train[, num]
+summary(train_num)
+```
+
+Bar plots to check relation to Sale price.
+
+
+
+```{r, fig.width = 18, fig.height = 14, echo = FALSE}
+
+t1 <- ggplot(train, aes(x = MSZoning)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) +
+scale_y_continuous(labels=percent) +
+ggtitle("Zoning Proportions") + theme(text = element_text(size = 15))
+train$MSZoning <- factor(train$MSZoning)
+
+t2 <- ggplot(train, aes(x = Street)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("Street Proportions") + theme(text = element_text(size = 15))
+train$Street <- factor(train$Street) 
+
+t3 <- ggplot(train, aes(x = Alley)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("Alley Proportions")+ theme(text = element_text(size = 15))
+train$Alley <- factor(train$Alley)
+
+t4 <- ggplot(train, aes(x = LotShape)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("LotShape Proportions")+ theme(text = element_text(size = 15))
+train$LotShape <- factor(train$LotShape)
+
+t5 <- ggplot(train, aes(x = LandContour)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("LandContour Proportions")+ theme(text = element_text(size = 15))
+train$LandContour <- factor(train$LandContour)
+
+t6 <- ggplot(train, aes(x = Utilities)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("Utilities Proportions")+ theme(text = element_text(size = 15))
+train$Utilities <- factor(train$Utilities)
+
+t6 <- ggplot(train, aes(x = LotConfig)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("LotConfig Proportions")+ theme(text = element_text(size = 15))
+train$LotConfig <- factor(train$LotConfig)
+
+t7 <- ggplot(train, aes(x = LandSlope)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("LandSlope Proportions")+ theme(text = element_text(size = 15))
+train$LandSlope <- factor(train$LandSlope)
+
+t8 <- ggplot(train, aes(x = Neighborhood)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("Neighborhood Proportions")+ theme(text = element_text(size = 15))
+train$Neighborhood <- factor(train$Neighborhood)
+
+t9 <- ggplot(train, aes(x = Condition1)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("Condition1 Proportions")+ theme(text = element_text(size = 15))
+train$Condition1 <- factor(train$Condition1)
+
+t10 <- ggplot(train, aes(x = Condition2)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("Condition2 Proportions")+ theme(text = element_text(size = 15))
+train$Condition2 <- factor(train$Condition2)
+
+t11 <- ggplot(train, aes(x = BldgType)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("BldgType Proportions")+ theme(text = element_text(size = 15))
+train$BldgType <- factor(train$BldgType)
+
+t12 <- ggplot(train, aes(x = HouseStyle)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("HouseStyle Proportions")+ theme(text = element_text(size = 15))
+train$HouseStyle <- factor(train$HouseStyle)
+
+t13 <- ggplot(train, aes(x = RoofStyle)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("RoofStyle Proportions")+ theme(text = element_text(size = 15))
+train$RoofStyle <- factor(train$RoofStyle)
+
+t14 <- ggplot(train, aes(x = RoofMatl)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("RoofMatl Proportions")+ theme(text = element_text(size = 15))
+train$RoofMatl <- factor(train$RoofMatl)
+
+t15 <- ggplot(train, aes(x = Exterior1st)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("Exterior1st Proportions")+ theme(text = element_text(size = 15))
+train$Exterior1st <- factor(train$Exterior1st)
+
+t16 <- ggplot(train, aes(x = Exterior2nd)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("Exterior2nd Proportions")+ theme(text = element_text(size = 15))
+train$Exterior2nd <- factor(train$Exterior2nd)
+
+t17 <- ggplot(train, aes(x = MasVnrType)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("MasVnrType Proportions")+ theme(text = element_text(size = 15))
+train$MasVnrType <- factor(train$MasVnrType)
+
+t18 <- ggplot(train, aes(x = ExterQual)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("ExterQual Proportions")+ theme(text = element_text(size = 15))
+train$ExterQual <- factor(train$ExterQual)
+
+t19 <- ggplot(train, aes(x = ExterCond)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("ExterCond Proportions")+ theme(text = element_text(size = 15))
+train$ExterCond <- factor(train$ExterCond)
+
+t20 <- ggplot(train, aes(x = Foundation)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("Foundation Proportions")+ theme(text = element_text(size = 15))
+train$Foundation <- factor(train$Foundation)
+
+t21 <- ggplot(train, aes(x = BsmtQual)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("BsmtQual Proportions")+ theme(text = element_text(size = 15))
+train$BsmtQual <- factor(train$BsmtQual)
+
+t22 <- ggplot(train, aes(x = BsmtCond)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("BsmtCond Proportions")+ theme(text = element_text(size = 15))
+train$BsmtCond <- factor(train$BsmtCond)
+
+t23 <- ggplot(train, aes(x = BsmtExposure)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("BsmtExposure Proportions")+ theme(text = element_text(size = 15))
+train$BsmtExposure <- factor(train$BsmtExposure)
+
+t24 <- ggplot(train, aes(x = BsmtFinType1)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("BsmtFinType1 Proportions")+ theme(text = element_text(size = 15))
+train$BsmtFinType1 <- factor(train$BsmtFinType1)
+
+t25 <- ggplot(train, aes(x = BsmtFinType2)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("BsmtFinType2 Proportions")+ theme(text = element_text(size = 15))
+train$BsmtFinType2 <- factor(train$BsmtFinType2)
+
+t26 <- ggplot(train, aes(x = Heating)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("Heating Proportions")+ theme(text = element_text(size = 15))
+train$Heating <- factor(train$Heating)
+
+t27 <- ggplot(train, aes(x = HeatingQC)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("HeatingQC Proportions")+ theme(text = element_text(size = 15))
+train$HeatingQC <- factor(train$HeatingQC)
+
+t28 <- ggplot(train, aes(x = CentralAir)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("CentralAir Proportions")+ theme(text = element_text(size = 15))
+train$CentralAir <- factor(train$CentralAir)
+
+t29 <- ggplot(train, aes(x = Electrical)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("Electrical Proportions")+ theme(text = element_text(size = 15))
+train$Electrical <- factor(train$Electrical)
+
+t30 <- ggplot(train, aes(x = KitchenQual)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("KitchenQual Proportions")+ theme(text = element_text(size = 15))
+train$KitchenQual <- factor(train$KitchenQual)
+
+t31 <- ggplot(train, aes(x = Functional)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("Functional Proportions")+ theme(text = element_text(size = 15))
+train$Functional <- factor(train$Functional)
+
+t32 <- ggplot(train, aes(x = FireplaceQu)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("FireplaceQu Proportions")+ theme(text = element_text(size = 15))
+train$FireplaceQu <- factor(train$FireplaceQu)
+
+t33 <- ggplot(train, aes(x = GarageType)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("GarageType Proportions")+ theme(text = element_text(size = 15))
+train$GarageType <- factor(train$GarageType)
+
+t34 <- ggplot(train, aes(x = GarageFinish)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("GarageFinish Proportions")+ theme(text = element_text(size = 15))
+train$GarageFinish <- factor(train$GarageFinish)
+
+t35 <- ggplot(train, aes(x = GarageQual)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("GarageQual Proportions")+ theme(text = element_text(size = 15))
+train$GarageQual <- factor(train$GarageQual)
+
+t36 <- ggplot(train, aes(x = GarageCond)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("GarageCond Proportions")+ theme(text = element_text(size = 15))
+train$GarageCond <- factor(train$GarageCond)
+
+t37 <- ggplot(train, aes(x = PavedDrive)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("PavedDrive Proportions")+ theme(text = element_text(size = 15))
+train$PavedDrive <- factor(train$PavedDrive)
+
+t38 <- ggplot(train, aes(x = PoolQC)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("PoolQC Proportions")+ theme(text = element_text(size = 15))
+train$PoolQC <- factor(train$PoolQC)
+
+t39 <- ggplot(train, aes(x = Fence)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("Fence Proportions")+ theme(text = element_text(size = 15))
+train$Fence <- factor(train$Fence)
+
+t40 <- ggplot(train, aes(x = MiscFeature)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("MiscFeature Proportions")+ theme(text = element_text(size = 15))
+train$MiscFeature <- factor(train$MiscFeature)
+
+t41 <- ggplot(train, aes(x = SaleType)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("SaleType Proportions")+ theme(text = element_text(size = 15))
+train$SaleType <- factor(train$SaleType)
+
+t42 <- ggplot(train, aes(x = SaleCondition)) +  
+geom_bar(aes(y = (..count..)/sum(..count..))) + 
+scale_y_continuous(labels=percent) +
+ggtitle("SaleCondition Proportions")+ theme(text = element_text(size = 15))
+train$SaleCondition <- factor(train$SaleCondition)
+
+grid.arrange(
+t1, t2, t3, t4, t5, t6, t7, t8, t9
+)
+
+grid.arrange(
+t10, t11, t12, t13, t14, t15, t16, t17, t18
+)
+
+grid.arrange(
+t19, t20, t21, t22, t23, t24, t25, t26, t27
+)
+
+grid.arrange(
+t28, t29, t30, t31, t31, t33, t34, t35, t36
+)
+
+grid.arrange(
+t36, t38, t39, t40, t41, t42
+)
+
+
+
+
+```
+
+
+
+## Histograms for Ordinal Data 
+
+
+
+Histograms for ordinal variables.  
+
+
+```{r, fig.width = 9, fig.height = 7, echo = FALSE}
+par(mfrow = c(5,3), oma = c(1, 1, 0, 0), mar=c(2, 3, 0, 1) + 2)
+hist(train$MSSubClass, breaks = 100, col = 'blue')
+hist(train$LotFrontage, breaks = 100, col = 'blue')
+hist(train$LotArea, breaks = 100, col = 'blue')
+hist(train$OverallQual, breaks = 100, col = 'blue')
+hist(train$OverallCond, breaks = 100, col = 'blue')
+hist(train$YearBuilt, breaks = 100, col = 'blue')
+hist(train$YearRemodAdd, breaks = 100, col = 'blue')
+hist(train$MasVnrArea, breaks = 100, col = 'blue')
+hist(train$BsmtFinSF1, breaks = 100, col = 'blue')
+hist(train$BsmtFinSF2, breaks = 100, col = 'blue')
+hist(train$BsmtUnfSF, breaks = 100, col = 'blue')
+hist(train$TotalBsmtSF, breaks = 100, col = 'blue')
+hist(train$X1stFlrSF, breaks = 100, col = 'blue')
+hist(train$X2ndFlrSF, breaks = 100, col = 'blue')
+hist(train$LowQualFinSF, breaks = 100, col = 'blue')
+hist(train$GrLivArea, breaks = 100, col = 'blue')
+hist(train$BsmtFullBath, breaks = 100, col = 'blue')
+hist(train$BsmtHalfBath, breaks = 100, col = 'blue')
+hist(train$FullBath, breaks = 100, col = 'blue')
+hist(train$HalfBath, breaks = 100, col = 'blue')
+hist(train$BedroomAbvGr, breaks = 100, col = 'blue')
+hist(train$KitchenAbvGr, breaks = 100, col = 'blue')
+hist(train$TotRmsAbvGrd, breaks = 100, col = 'blue')
+hist(train$Fireplaces, breaks = 100, col = 'blue')
+hist(train$GarageYrBlt, breaks = 100, col = 'blue')
+hist(train$GarageCars, breaks = 100, col = 'blue')
+hist(train$GarageArea, breaks = 100, col = 'blue')
+hist(train$WoodDeckSF, breaks = 100, col = 'blue')
+hist(train$OpenPorchSF, breaks = 100, col = 'blue')
+hist(train$EnclosedPorch, breaks = 100, col = 'blue')
+hist(train$X3SsnPorch, breaks = 100, col = 'blue')
+hist(train$ScreenPorch, breaks = 100, col = 'blue')
+hist(train$PoolArea, breaks = 100, col = 'blue')
+hist(train$MiscVal, breaks = 100, col = 'blue')
+hist(train$MoSold, breaks = 100, col = 'blue')
+hist(train$YrSold, breaks = 100, col = 'blue')
+hist(train$SalePrice, breaks = 100, col = 'blue')
+hist(train$MSSubClass, breaks = 100, col = 'blue')
+hist(train$LotFrontage, breaks = 100, col = 'blue')
+hist(train$LotArea, breaks = 100, col = 'blue')
+hist(train$OverallQual, breaks = 100, col = 'blue')
+hist(train$OverallCond, breaks = 100, col = 'blue')
+hist(train$YearBuilt, breaks = 100, col = 'blue')
+hist(train$YearRemodAdd, breaks = 100, col = 'blue')
+hist(train$MasVnrArea, breaks = 100, col = 'blue')
+hist(train$BsmtFinSF1, breaks = 100, col = 'blue')
+hist(train$BsmtFinSF2, breaks = 100, col = 'blue')
+hist(train$BsmtUnfSF, breaks = 100, col = 'blue')
+hist(train$TotalBsmtSF, breaks = 100, col = 'blue')
+hist(train$X1stFlrSF, breaks = 100, col = 'blue')
+hist(train$X2ndFlrSF, breaks = 100, col = 'blue')
+hist(train$LowQualFinSF, breaks = 100, col = 'blue')
+hist(train$GrLivArea, breaks = 100, col = 'blue')
+hist(train$BsmtFullBath, breaks = 100, col = 'blue')
+hist(train$BsmtHalfBath, breaks = 100, col = 'blue')
+hist(train$FullBath, breaks = 100, col = 'blue')
+hist(train$HalfBath, breaks = 100, col = 'blue')
+hist(train$BedroomAbvGr, breaks = 100, col = 'blue')
+hist(train$KitchenAbvGr, breaks = 100, col = 'blue')
+hist(train$TotRmsAbvGrd, breaks = 100, col = 'blue')
+hist(train$Fireplaces, breaks = 100, col = 'blue')
+hist(train$GarageYrBlt, breaks = 100, col = 'blue')
+hist(train$GarageCars, breaks = 100, col = 'blue')
+hist(train$GarageArea, breaks = 100, col = 'blue')
+hist(train$WoodDeckSF, breaks = 100, col = 'blue')
+hist(train$OpenPorchSF, breaks = 100, col = 'blue')
+hist(train$EnclosedPorch, breaks = 100, col = 'blue')
+hist(train$X3SsnPorch, breaks = 100, col = 'blue')
+hist(train$ScreenPorch, breaks = 100, col = 'blue')
+hist(train$PoolArea, breaks = 100, col = 'blue')
+hist(train$MiscVal, breaks = 100, col = 'blue')
+hist(train$MoSold, breaks = 100, col = 'blue')
+hist(train$YrSold, breaks = 100, col = 'blue')
+hist(train$SalePrice, breaks = 100, col = 'blue')
+```
+
+
+
+
