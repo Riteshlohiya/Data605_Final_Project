@@ -9,7 +9,7 @@ output: html_document
 
 #           IS 605 FUNDAMENTALS OF COMPUTATIONAL MATHEMATICS
 
-#install.packages('Amelia')
+#install.packages('corrr')
 
 #install.packages('ggpubr')
 
@@ -88,6 +88,10 @@ library(scales)
 library(Matrix)
 
 library(Amelia)
+
+library(mlr)
+
+library(corrr)
 ```
 
 #Problem 1
@@ -836,17 +840,20 @@ We will see the missing values in the dataset. For this i have used Amelia packa
 missmap(train, main = "Missing values vs observed",  color='dodgerblue')
 ```
 
+
+
 We can see there are lots of missing values. We will replace the missing values.
 
 ```{r}
+
+#Missing value handling
+
+train[sapply(train, is.factor)] <- lapply(train[sapply(train, is.factor)], as.character)
 
 train$GarageYrBlt[is.na(train$GarageYrBlt)] <- train$YearBuilt[is.na(train$GarageYrBlt)] 
 train$LotFrontage[is.na(train$LotFrontage)] <- 0
 train$MasVnrArea[is.na(train$MasVnrArea)] <- 0
 train$Alley[is.na(train$Alley)] <- 'None'
-
-
-
 train$MasVnrType[is.na(train$MasVnrType)] <- 'None'
 train$BsmtQual[is.na(train$BsmtQual)] <- 'None'
 train$BsmtCond[is.na(train$BsmtCond)] <- 'Xa'
@@ -877,14 +884,54 @@ train$GarageCars[is.na(train$GarageCars)] <- 0
 train$GarageArea[is.na(train$GarageArea)] <- 0
 train$SaleType[is.na(train$SaleType)] <- 'None'
 
+train[sapply(train, is.character)] <- lapply(train[sapply(train, is.character)], as.factor)
 ```
-
-
 
 ```{r}
 missmap(train, main = "Missing values vs observed",  color='dodgerblue')
 ```
 
+Creating dummy values:
+
 ```{r}
-summary(train)
+train <- createDummyFeatures(train, method = "reference")
 ```
+
+Outlier treatment using mean:
+
+```{r}
+train$TotalBsmtSF[train$TotalBsmtSF > 6000] <- mean(train$TotalBsmtSF[train$TotalBsmtSF < 6000])
+train$X1stFlrSF[train$X1stFlrSF > 4000] <- mean(train$X1stFlrSF[train$X1stFlrSF < 4000])
+#train$GrLivArea[train$GrLivArea > 5000] <- mean(train$GrLivArea[train$GrLivArea < 5000])
+```
+
+#Model 1: Taking all the variables:
+
+
+```{r}
+model1 <- lm(SalePrice ~ ., data = train)
+summary(model1)
+```
+
+Model 2: Taking only the variables whoes P <.05.
+
+```{r}
+model2 <- lm(SalePrice ~ LotArea + OverallQual + OverallCond + YearBuilt + MasVnrArea + BsmtFinSF1 + BsmtFinSF2 + BsmtUnfSF  + TotalBsmtSF +
+                X1stFlrSF + X2ndFlrSF + BedroomAbvGr + KitchenAbvGr + Fireplaces + GarageArea  + ScreenPorch + PoolArea +
+               MSZoning.FV + MSZoning.RL  + Pave + LotConfig.CulDSac  + LandSlope.Sev + Neighborhood.Edwards +
+               Neighborhood.Mitchel + Neighborhood.NAmes + Neighborhood.NoRidge + Neighborhood.NridgHt + Neighborhood.NWAmes + 
+               Neighborhood.StoneBr + Condition1.Norm + Condition2.PosN + Condition2.RRAe + RoofStyle.Shed +
+               RoofMatl.CompShg  + RoofMatl.Tar.Grv +  RoofMatl.WdShake + ExterQual.Gd + ExterQual.TA + BsmtQual.Gd + BsmtQual.TA +
+               BsmtExposure.Gd + BsmtExposure.No  + KitchenQual.Fa + KitchenQual.Gd + KitchenQual.TA + 
+               Functional.Typ  + GarageQual.Fa +  GarageQual.Gd + GarageQual.Po + GarageQual.TA + GarageCond.Fa +
+               GarageCond.Gd + GarageCond.Po + GarageCond.TA + PoolQC.Fa + PoolQC.Gd + PoolQC.None, data = train)
+summary(model2)
+```
+
+
+
+
+
+
+
+
