@@ -9,89 +9,48 @@ output: html_document
 
 #           IS 605 FUNDAMENTALS OF COMPUTATIONAL MATHEMATICS
 
-#install.packages('corrr')
-
-#install.packages('ggpubr')
 
 ```{r}
-
-library(readr)
-
-library(kableExtra)
-
-library(tidyverse)
-
-library(knitr)
-
-library(psych)
-
-library(gridExtra)
-
-library(usdm)
-
-library(mice)
-
-library(ggiraph)
-
-library(cowplot)
-
-library(reshape2)
-
-library(corrgram)
-
-library(caTools)
-
-library(caret)
-
-library(ROCR)
-
-library(pROC)
-
-library(reshape2)
-
-library(Amelia)
-
-library(qqplotr)
-
-library(moments)
-
-library(car)
-
-library(MASS)
-
-library(geoR)
-
-library(xtable)
-
-library(plyr)
-
-library(Hmisc)
-
-library(corrplot)
-
-library(PerformanceAnalytics)
-
-library(ggpubr)
-
-library(matrixcalc)
-
-library(alr3)
-
-library(bestglm)
-
-library(car)
-
-library(gridExtra)
-
-library(scales)
-
-library(Matrix)
-
-library(Amelia)
-
-library(mlr)
-
-library(corrr)
+#Load libraries
+suppressMessages(suppressWarnings(library(readr)))
+suppressMessages(suppressWarnings(library(kableExtra)))
+suppressMessages(suppressWarnings(library(tidyverse)))
+suppressMessages(suppressWarnings(library(knitr)))
+suppressMessages(suppressWarnings(library(psych)))
+suppressMessages(suppressWarnings(library(gridExtra)))
+suppressMessages(suppressWarnings(library(usdm)))
+suppressMessages(suppressWarnings(library(mice)))
+suppressMessages(suppressWarnings(library(ggiraph)))
+suppressMessages(suppressWarnings(library(cowplot)))
+suppressMessages(suppressWarnings(library(reshape2)))
+suppressMessages(suppressWarnings(library(corrgram)))
+suppressMessages(suppressWarnings(library(caTools)))
+suppressMessages(suppressWarnings(library(caret)))
+suppressMessages(suppressWarnings(library(ROCR)))
+suppressMessages(suppressWarnings(library(pROC)))
+suppressMessages(suppressWarnings(library(reshape2)))
+suppressMessages(suppressWarnings(library(Amelia)))
+suppressMessages(suppressWarnings(library(qqplotr)))
+suppressMessages(suppressWarnings(library(moments)))
+suppressMessages(suppressWarnings(library(car)))
+suppressMessages(suppressWarnings(library(MASS)))
+suppressMessages(suppressWarnings(library(geoR)))
+suppressMessages(suppressWarnings(library(xtable)))
+suppressMessages(suppressWarnings(library(plyr)))
+suppressMessages(suppressWarnings(library(Hmisc)))
+suppressMessages(suppressWarnings(library(corrplot)))
+suppressMessages(suppressWarnings(library(PerformanceAnalytics)))
+suppressMessages(suppressWarnings(library(ggpubr)))
+suppressMessages(suppressWarnings(library(matrixcalc)))
+suppressMessages(suppressWarnings(library(alr3)))
+suppressMessages(suppressWarnings(library(bestglm)))
+suppressMessages(suppressWarnings(library(car)))
+suppressMessages(suppressWarnings(library(gridExtra)))
+suppressMessages(suppressWarnings(library(scales)))
+suppressMessages(suppressWarnings(library(Matrix)))
+suppressMessages(suppressWarnings(library(Amelia)))
+suppressMessages(suppressWarnings(library(mlr)))
+suppressMessages(suppressWarnings(library(corrr)))
 ```
 
 #Problem 1
@@ -280,7 +239,7 @@ train_num <- train[, num]
 summary(train_num)
 ```
 
-Bar plots to check relation to Sale price.
+#Bar plots to check relation to Sale price.
 
 
 
@@ -575,9 +534,6 @@ t36, t38, t39, t40, t41, t42
 
 
 
-Histograms for ordinal variables.  
-
-
 ```{r, fig.width = 9, fig.height = 7, echo = FALSE}
 par(mfrow = c(5,3), oma = c(1, 1, 0, 0), mar=c(2, 3, 0, 1) + 2)
 hist(train$MSSubClass, breaks = 100, col = 'blue')
@@ -674,19 +630,19 @@ pairs.panels(train_cor_matrix)
 
 ##Corelation test bwteen each pair:
 
-Test between 'TotalBsmtSF' and 'SalePrice'
+##Test between 'TotalBsmtSF' and 'SalePrice'
 
 ```{r}
 cor.test(train$TotalBsmtSF, train$SalePrice, method = "pearson", conf.level = 0.80)
 ```
 
-Test between 'GrLivArea' and 'SalePrice'
+##Test between 'GrLivArea' and 'SalePrice'
 
 ```{r}
 cor.test(train$GrLivArea, train$SalePrice, method = "pearson", conf.level = 0.80)
 ```
 
-Test between 'GrLivArea' and 'TotalBsmtSF'
+##Test between 'GrLivArea' and 'TotalBsmtSF'
 
 ```{r}
 cor.test(train$GrLivArea, train$TotalBsmtSF, method = "pearson", conf.level = 0.80)
@@ -702,26 +658,26 @@ Yes, there are variables in this dataset that might have impact on the corelatio
 
 Invert your 3 x 3 correlation matrix from above. (This is known as the precision matrix and contains variance inflation factors on the diagonal.) Multiply the correlation matrix by the precision matrix, and then multiply the precision matrix by the correlation matrix. Conduct LU decomposition on the matrix.  
 
-Correlation Matrix:
+##Correlation Matrix:
 
 ```{r}
 train_cor_matrix
 ```
 
-Precision matrix:
+##Precision matrix:
 
 ```{r}
 pre_matrix <- solve(train_cor_matrix)
 pre_matrix
 ```
 
-Multiplication of correlation matrix by the precision matrix:
+##Multiplication of correlation matrix by the precision matrix:
 
 ```{r}
 round((train_cor_matrix %*% pre_matrix), 2)
 ```
 
-Multiplication of precision matrix by the correlation matrix:
+##Multiplication of precision matrix by the correlation matrix:
 
 ```{r}
 round((pre_matrix %*% train_cor_matrix), 2)
@@ -787,7 +743,7 @@ expo$estimate
 smpl <- rexp(1000, expo$estimate)
 ```
 
-Histogram of the samples and the original :
+##Histogram of the samples and the original :
 
 ```{r}
 hist(train$GrLivArea)
@@ -837,7 +793,7 @@ The 5th and 95th percentiles are 4.070 and 21.735 respectively.
 test <- read.csv("https://raw.githubusercontent.com/Riteshlohiya/Data605_Final_Project/master/test.csv", header = TRUE, stringsAsFactors = FALSE)
  
 train <- cbind.data.frame(train, RecType = "Train")
-test <- cbind.data.frame(test, RecType = "Test", SalePrice = 0)
+test <- cbind.data.frame(test, RecType = "Test")
 
 train_test <- rbind.data.frame(train, test, stringsAsFactors = FALSE)
 ```
@@ -845,6 +801,7 @@ train_test <- rbind.data.frame(train, test, stringsAsFactors = FALSE)
 
 We will see the missing values in the dataset. For this i have used Amelia package
 
+##Missing value plot before treatment:
 
 ```{r}
 missmap(train_test, main = "Missing values vs observed",  color='dodgerblue')
@@ -900,6 +857,9 @@ train_test$SalePrice[is.na(train$SalePrice)] <- 0
 train_test[sapply(train_test, is.character)] <- lapply(train_test[sapply(train_test, is.character)], as.factor)
 ```
 
+
+##Missing value plot after treatment:
+
 ```{r}
 missmap(train_test, main = "Missing values vs observed",  color='dodgerblue')
 ```
@@ -915,23 +875,23 @@ Outlier treatment using mean:
 ```{r}
 train_test$TotalBsmtSF[train_test$TotalBsmtSF > 6000] <- mean(train_test$TotalBsmtSF[train_test$TotalBsmtSF < 6000])
 train_test$X1stFlrSF[train_test$X1stFlrSF > 4000] <- mean(train_test$X1stFlrSF[train_test$X1stFlrSF < 4000])
-```
+``` 
 
 ```{r}
 # Split the combined transformed dataset into train and test.
-data_train <- train_test[train_test$RecType.Train == 1, ]
-data_test <- train_test[train_test$RecType.Train == 0, ]
+data_train <- train_test[train_test$Train == 1, ]
+data_test <- train_test[train_test$Train == 0, ]
 
 # remove id and train/test flag variables from train dataset
-data_train <- subset(data_train, select = -c(Id, RecType.Test))
+data_train <- subset(data_train, select = -c(Id,Train))
 
 # remove SalePrice variables from test dataset
-data_test <- subset(data_test, select = -c(SalePrice, RecType.Test))
+data_test <- subset(data_test, select = -c(SalePrice,Train))
 ```
 
 
 
-#Model 1: Taking all the variables:
+##Model 1: Taking all the variables: 
 
 
 ```{r}
@@ -939,9 +899,9 @@ model1 <- lm(SalePrice ~ ., data = data_train)
 summary(model1)
 ```
 
-R-squared is 0.93, This means 93% variance of the sale price can be explained by predictor variables in the model. F-statistic is 66.65 with 1206 of degree of freedom and p-value is also very small.
+R-squared is 0.93, This means 93% variance of the sale price can be explained by predictor variables in the model. F-statistic is 66.94 with 1207 of degree of freedom and p-value is also very small.
 
-Model 2: Taking only the variables whoes P <.05.
+##Model 2: Taking only the variables whoes P <.05.
 
 ```{r}
 model2 <- lm(SalePrice ~ LotArea + OverallQual + OverallCond + YearBuilt + MasVnrArea + BsmtFinSF1 + BsmtFinSF2 + BsmtUnfSF  + TotalBsmtSF +
@@ -963,27 +923,41 @@ This model did not give any performance improvement. R-squared is 0.91, This mea
 
 
 ```{r}
-predictedData_model1 <- data_test
-predictedData_model2 <- Data_test
+model1_data <- data_test
+model2_data <- data_test
 # modelColumns <- colnames(HouseDF) testDF_model <-
 # testData[,colnames(testData) %in% modelColumns]
 
-predictedData_model1$salePrice <- predict(model1, data_test)
-predictedData_model2$salePrice <- predict(model2, Data_test)
+model1_data$salePrice <- predict(model1, data_test)
+model2_data$salePrice <- predict(model2, data_test)
 
 Id <- data_test$Id
 # Kaggle dataset for model1
-salePrice <- predictedData_model1$salePrice
-kaggleData_modelDF <- data.frame(cbind(Id, salePrice))
-kaggleData_modelDF[is.na(kaggleData_modelDF)] <- 0
+salePrice <- model1_data$salePrice
+kaggleData1 <- data.frame(cbind(Id, salePrice))
+kaggleData1[is.na(kaggleData1)] <- 0
 # write.csv(kaggleData_modelDF,'kaggleData_model.csv')
 
 # Kaggle dataset for model2
-salePrice <- predictedData_model2$salePrice
-kaggleData_modelDF2 <- data.frame(cbind(Id, salePrice))
-kaggleData_modelDF2[is.na(kaggleData_modelDF2)] <- 0
+salePrice <- model2_data$salePrice
+kaggleData2 <- data.frame(cbind(Id, salePrice))
+kaggleData2[is.na(kaggleData2)] <- 0
+
+write.csv(kaggleData1,'C:/Users/rites/Documents/GitHub/Data605_Final_Project/kaggleout1.csv', row.names = F)
+write.csv(kaggleData2,'C:/Users/rites/Documents/GitHub/Data605_Final_Project/kaggleout2.csv', row.names = F)
 
 ```
+
+#Kaggle.com user name : riteshlohiya999
+#Kaggle score: 
+#Model1 : 0.47336
+#Model2: 0.50297
+
+For my 1st model: R-squared is 0.93, This means 93% variance of the sale price can be explained by predictor variables in the model. F-statistic is 66.94 with 1207 of degree of freedom and p-value is also very small. Kaggke score is 0.47336
+
+For my 2nd model: This model did not give any performance improvement. R-squared is 0.91, This means 91% variance of the sale price can be explained by predictor variables in the model. F-statistic is 249.2 with 1402 of degree of freedom and p-value remains the same.
+
+
 
 
 
