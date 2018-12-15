@@ -9,7 +9,7 @@ output: html_document
 
 #           IS 605 FUNDAMENTALS OF COMPUTATIONAL MATHEMATICS
 
-#install.packages('bestglm')
+#install.packages('Amelia')
 
 #install.packages('ggpubr')
 
@@ -81,15 +81,13 @@ library(bestglm)
 
 library(car)
 
-
 library(gridExtra)
-
-
 
 library(scales)
 
+library(Matrix)
 
-
+library(Amelia)
 ```
 
 #Problem 1
@@ -244,7 +242,7 @@ we can see that P(A|B) is 0.2 and P(A) * P(B) is 0.1875. They are very near. The
 
 ```{r}
 #download the train
-train <- read.csv("https://raw.githubusercontent.com/Riteshlohiya/Data605_Final_Project/master/train.csv", stringsAsFactors = FALSE)
+train <- read.csv("https://raw.githubusercontent.com/Riteshlohiya/Data605_Final_Project/master/train.csv", header = TRUE, stringsAsFactors = FALSE)
 ```
 
 ##Descriptive and Inferential Statistics.
@@ -698,4 +696,195 @@ Yes, there are variables in this dataset that might have impact on the corelatio
 
 #Linear Algebra and Correlation:
 
+Invert your 3 x 3 correlation matrix from above. (This is known as the precision matrix and contains variance inflation factors on the diagonal.) Multiply the correlation matrix by the precision matrix, and then multiply the precision matrix by the correlation matrix. Conduct LU decomposition on the matrix.  
 
+Correlation Matrix:
+
+```{r}
+train_cor_matrix
+```
+
+Precision matrix:
+
+```{r}
+pre_matrix <- solve(train_cor_matrix)
+pre_matrix
+```
+
+Multiplication of correlation matrix by the precision matrix:
+
+```{r}
+round((train_cor_matrix %*% pre_matrix), 2)
+```
+
+Multiplication of precision matrix by the correlation matrix:
+
+```{r}
+round((pre_matrix %*% train_cor_matrix), 2)
+```
+
+Both the matrix is identical.
+
+##LU decomposition of corelation matrix:
+
+```{r}
+cor_lu <- lu(train_cor_matrix)
+cor_lu_exd <- expand(cor_lu)
+
+L_cor <- cor_lu_exd$L
+U_cor <- cor_lu_exd$U
+
+L_cor
+U_cor
+```
+
+##LU decomposition of precision matrix:
+
+
+```{r}
+pre_lu <- lu(pre_matrix)
+pre_lu_exd <- expand(pre_lu)
+
+L_pre <- pre_lu_exd$L
+U_pre <- pre_lu_exd$U
+
+L_pre
+U_pre
+```
+
+Lets multiply the lower and uper matrix and see if it returns the original matrices or not.
+
+```{r}
+L_cor %*% U_cor
+L_pre %*% U_pre
+```
+
+It returns the original matrices.
+
+#Calculus-Based Probability & Statistics
+
+Many times, it makes sense to fit a closed form distribution to data.  Select a variable in the Kaggle.com training dataset that  is skewed to the right, shift it so that the minimum value is absolutely above zero if necessary.  Then load the MASS package and run fitdistr to fit an exponential probability density function.  (See  https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/fitdistr.html ).  Find the optimal value of ??? for this distribution, and then take 1000 samples from this exponential distribution using this value (e.g., rexp(1000, ???)).  Plot a histogram and compare it with a histogram of your original variable.   Using the exponential pdf, find the 5th and 95th percentiles using the cumulative distribution function (CDF).   Also generate a 95% confidence interval from the empirical data, assuming normality.  Finally, provide the empirical 5th percentile and 95th percentile of the data.  Discuss.
+
+```{r}
+min(train$GrLivArea)
+```
+
+The minimum value is 334, so i dont think we need shifting.
+
+Fitting the exponential probability density function:
+
+```{r}
+expo <- fitdistr(train$GrLivArea, densfun = "exponential")
+options(scipen = 999)
+expo$estimate
+```
+
+```{r}
+smpl <- rexp(1000, expo$estimate)
+```
+
+Histogram of the samples and the original :
+
+```{r}
+hist(train$GrLivArea)
+hist(smpl)
+```
+
+The samples data is more skewed than the original data.
+
+Using the exponential pdf, find the 5th and 95th percentiles using the cumulative distribution function (CDF):
+
+```{r}
+P = ecdf(smpl)
+plot(P)
+
+c <- quantile(P, c(0.05, 0.95))
+c
+```
+
+The 5th and 95th percentiles of the samples (simulated data) are 87.16779 and 4759.05707 respectively.
+
+Generate a 95% confidence interval from the empirical data, assuming normality:
+
+```{r}
+er <- qnorm(0.975) * sd(train$GrLivArea)/sqrt(length(train$GrLivArea))
+conf_95 <- c(mean(train$GrLivArea) - er, mean(train$GrLivArea) + er)
+conf_95
+```
+
+The 95% confidence interval is 1488.509 1542.418
+
+Provide the empirical 5th percentile and 95th percentile of the data:
+
+```{r}
+e <- quantile(X, c(0.05, 0.95))
+e
+```
+
+The 5th and 95th percentiles are 4.070 and 21.735 respectively.
+
+#Modeling:
+
+
+##Data preparation
+
+
+We will see the missing values in the dataset. For this i have used Amelia package
+
+
+```{r}
+missmap(train, main = "Missing values vs observed",  color='dodgerblue')
+```
+
+We can see there are lots of missing values. We will replace the missing values.
+
+```{r}
+
+train$GarageYrBlt[is.na(train$GarageYrBlt)] <- train$YearBuilt[is.na(train$GarageYrBlt)] 
+train$LotFrontage[is.na(train$LotFrontage)] <- 0
+train$MasVnrArea[is.na(train$MasVnrArea)] <- 0
+train$Alley[is.na(train$Alley)] <- 'None'
+
+
+
+train$MasVnrType[is.na(train$MasVnrType)] <- 'None'
+train$BsmtQual[is.na(train$BsmtQual)] <- 'None'
+train$BsmtCond[is.na(train$BsmtCond)] <- 'Xa'
+train$BsmtExposure[is.na(train$BsmtExposure)] <- 'Xb'
+train$BsmtFinType1[is.na(train$BsmtFinType1)] <- 'Xc'
+train$BsmtFinType2[is.na(train$BsmtFinType2)] <- 'Xd'
+train$GarageType [is.na(train$GarageType )] <- 'Xe'
+train$GarageFinish[is.na(train$GarageFinish)] <- 'Xf'
+train$GarageQual[is.na(train$GarageQual)] <- 'Xg'
+train$GarageCond[is.na(train$GarageCond)] <- 'Xh'
+train$Electrical[is.na(train$Electrical)] <- 'None'
+train$FireplaceQu[is.na(train$FireplaceQu)] <- 'None'
+train$PoolQC[is.na(train$PoolQC)] <- 'None'
+train$Fence[is.na(train$Fence)] <- 'None'
+train$MiscFeature[is.na(train$MiscFeature)] <- 'None'
+train$MSZoning[is.na(train$MSZoning)] <- 'C (all)'
+train$Utilities[is.na(train$Utilities)] <- 'AllPub'
+train$BsmtFullBath[is.na(train$BsmtFullBath)] <- 0
+train$BsmtHalfBath[is.na(train$BsmtHalfBath)] <- 0
+train$Exterior1st[is.na(train$Exterior1st)] <- 'BrkFace'
+train$Exterior2nd[is.na(train$Exterior2nd)] <- 'BrkFace'
+train$Functional[is.na(train$Functional)] <- 'Typ'
+train$BsmtFinSF1[is.na(train$BsmtFinSF1)] <- 0
+train$BsmtFinSF2[is.na(train$BsmtFinSF2)] <- 0
+train$BsmtUnfSF[is.na(train$BsmtUnfSF)] <- 0
+train$TotalBsmtSF[is.na(train$TotalBsmtSF)] <- 0
+train$GarageCars[is.na(train$GarageCars)] <- 0
+train$GarageArea[is.na(train$GarageArea)] <- 0
+train$SaleType[is.na(train$SaleType)] <- 'None'
+
+```
+
+
+
+```{r}
+missmap(train, main = "Missing values vs observed",  color='dodgerblue')
+```
+
+```{r}
+summary(train)
+```
