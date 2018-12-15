@@ -245,7 +245,7 @@ we can see that P(A|B) is 0.2 and P(A) * P(B) is 0.1875. They are very near. The
 ##You are to register for Kaggle.com (free) and compete in the House Prices: Advanced Regression Techniques competition.  https://www.kaggle.com/c/house-prices-advanced-regression-techniques .  I want you to do the following.
 
 ```{r}
-#download the train
+#download the train data
 train <- read.csv("https://raw.githubusercontent.com/Riteshlohiya/Data605_Final_Project/master/train.csv", header = TRUE, stringsAsFactors = FALSE)
 ```
 
@@ -832,12 +832,22 @@ The 5th and 95th percentiles are 4.070 and 21.735 respectively.
 
 ##Data preparation
 
+```{r}
+#download the train data
+test <- read.csv("https://raw.githubusercontent.com/Riteshlohiya/Data605_Final_Project/master/test.csv", header = TRUE, stringsAsFactors = FALSE)
+ 
+train <- cbind.data.frame(train, RecType = "Train")
+test <- cbind.data.frame(test, RecType = "Test", SalePrice = 0)
+
+train_test <- rbind.data.frame(train, test, stringsAsFactors = FALSE)
+```
+
 
 We will see the missing values in the dataset. For this i have used Amelia package
 
 
 ```{r}
-missmap(train, main = "Missing values vs observed",  color='dodgerblue')
+missmap(train_test, main = "Missing values vs observed",  color='dodgerblue')
 ```
 
 
@@ -848,70 +858,88 @@ We can see there are lots of missing values. We will replace the missing values.
 
 #Missing value handling
 
-train[sapply(train, is.factor)] <- lapply(train[sapply(train, is.factor)], as.character)
+train_test[sapply(train_test, is.factor)] <- lapply(train_test[sapply(train_test, is.factor)], as.character)
 
-train$GarageYrBlt[is.na(train$GarageYrBlt)] <- train$YearBuilt[is.na(train$GarageYrBlt)] 
-train$LotFrontage[is.na(train$LotFrontage)] <- 0
-train$MasVnrArea[is.na(train$MasVnrArea)] <- 0
-train$Alley[is.na(train$Alley)] <- 'None'
-train$MasVnrType[is.na(train$MasVnrType)] <- 'None'
-train$BsmtQual[is.na(train$BsmtQual)] <- 'None'
-train$BsmtCond[is.na(train$BsmtCond)] <- 'Xa'
-train$BsmtExposure[is.na(train$BsmtExposure)] <- 'Xb'
-train$BsmtFinType1[is.na(train$BsmtFinType1)] <- 'Xc'
-train$BsmtFinType2[is.na(train$BsmtFinType2)] <- 'Xd'
-train$GarageType [is.na(train$GarageType )] <- 'Xe'
-train$GarageFinish[is.na(train$GarageFinish)] <- 'Xf'
-train$GarageQual[is.na(train$GarageQual)] <- 'Xg'
-train$GarageCond[is.na(train$GarageCond)] <- 'Xh'
-train$Electrical[is.na(train$Electrical)] <- 'None'
-train$FireplaceQu[is.na(train$FireplaceQu)] <- 'None'
-train$PoolQC[is.na(train$PoolQC)] <- 'None'
-train$Fence[is.na(train$Fence)] <- 'None'
-train$MiscFeature[is.na(train$MiscFeature)] <- 'None'
-train$MSZoning[is.na(train$MSZoning)] <- 'C (all)'
-train$Utilities[is.na(train$Utilities)] <- 'AllPub'
-train$BsmtFullBath[is.na(train$BsmtFullBath)] <- 0
-train$BsmtHalfBath[is.na(train$BsmtHalfBath)] <- 0
-train$Exterior1st[is.na(train$Exterior1st)] <- 'BrkFace'
-train$Exterior2nd[is.na(train$Exterior2nd)] <- 'BrkFace'
-train$Functional[is.na(train$Functional)] <- 'Typ'
-train$BsmtFinSF1[is.na(train$BsmtFinSF1)] <- 0
-train$BsmtFinSF2[is.na(train$BsmtFinSF2)] <- 0
-train$BsmtUnfSF[is.na(train$BsmtUnfSF)] <- 0
-train$TotalBsmtSF[is.na(train$TotalBsmtSF)] <- 0
-train$GarageCars[is.na(train$GarageCars)] <- 0
-train$GarageArea[is.na(train$GarageArea)] <- 0
-train$SaleType[is.na(train$SaleType)] <- 'None'
+train_test$GarageYrBlt[is.na(train_test$GarageYrBlt)] <- train_test$YearBuilt[is.na(train_test$GarageYrBlt)] 
+train_test$LotFrontage[is.na(train_test$LotFrontage)] <- 0
+train_test$MasVnrArea[is.na(train_test$MasVnrArea)] <- 0
+train_test$Alley[is.na(train_test$Alley)] <- 'None'
+train_test$Utilities[is.na(train_test$Utilities)] <- 'NoSeWa'
+train_test$MasVnrType[is.na(train_test$MasVnrType)] <- 'None'
+train_test$BsmtQual[is.na(train_test$BsmtQual)] <- 'None'
+train_test$BsmtCond[is.na(train_test$BsmtCond)] <- 'Xa'
+train_test$BsmtExposure[is.na(train_test$BsmtExposure)] <- 'Xb'
+train_test$BsmtFinType1[is.na(train_test$BsmtFinType1)] <- 'Xc'
+train_test$BsmtFinType2[is.na(train_test$BsmtFinType2)] <- 'Xd'
+train_test$GarageType [is.na(train_test$GarageType )] <- 'Xe'
+train_test$GarageFinish[is.na(train_test$GarageFinish)] <- 'Xf'
+train_test$GarageQual[is.na(train_test$GarageQual)] <- 'Xg'
+train_test$GarageCond[is.na(train_test$GarageCond)] <- 'Xh'
+train_test$Electrical[is.na(train_test$Electrical)] <- 'None'
+train_test$FireplaceQu[is.na(train_test$FireplaceQu)] <- 'None'
+train_test$PoolQC[is.na(train_test$PoolQC)] <- 'None'
+train_test$Fence[is.na(train_test$Fence)] <- 'None'
+train_test$MiscFeature[is.na(train_test$MiscFeature)] <- 'None'
+train_test$MSZoning[is.na(train_test$MSZoning)] <- 'C (all)'
+train_test$Utilities[is.na(train_test$Utilities)] <- 'AllPub'
+train_test$BsmtFullBath[is.na(train_test$BsmtFullBath)] <- 0
+train_test$BsmtHalfBath[is.na(train_test$BsmtHalfBath)] <- 0
+train_test$Exterior1st[is.na(train_test$Exterior1st)] <- 'BrkFace'
+train_test$Exterior2nd[is.na(train_test$Exterior2nd)] <- 'BrkFace'
+train_test$Functional[is.na(train_test$Functional)] <- 'Typ'
+train_test$BsmtFinSF1[is.na(train_test$BsmtFinSF1)] <- 0
+train_test$BsmtFinSF2[is.na(train_test$BsmtFinSF2)] <- 0
+train_test$BsmtUnfSF[is.na(train_test$BsmtUnfSF)] <- 0
+train_test$TotalBsmtSF[is.na(train_test$TotalBsmtSF)] <- 0
+train_test$GarageCars[is.na(train_test$GarageCars)] <- 0
+train_test$GarageArea[is.na(train_test$GarageArea)] <- 0
+train_test$SaleType[is.na(train_test$SaleType)] <- 'None'
+train_test$SalePrice[is.na(train$SalePrice)] <- 0
 
-train[sapply(train, is.character)] <- lapply(train[sapply(train, is.character)], as.factor)
+
+train_test[sapply(train_test, is.character)] <- lapply(train_test[sapply(train_test, is.character)], as.factor)
 ```
 
 ```{r}
-missmap(train, main = "Missing values vs observed",  color='dodgerblue')
+missmap(train_test, main = "Missing values vs observed",  color='dodgerblue')
 ```
 
 Creating dummy values:
 
 ```{r}
-train <- createDummyFeatures(train, method = "reference")
+train_test <- createDummyFeatures(train_test, method = "reference")
 ```
 
 Outlier treatment using mean:
 
 ```{r}
-train$TotalBsmtSF[train$TotalBsmtSF > 6000] <- mean(train$TotalBsmtSF[train$TotalBsmtSF < 6000])
-train$X1stFlrSF[train$X1stFlrSF > 4000] <- mean(train$X1stFlrSF[train$X1stFlrSF < 4000])
-#train$GrLivArea[train$GrLivArea > 5000] <- mean(train$GrLivArea[train$GrLivArea < 5000])
+train_test$TotalBsmtSF[train_test$TotalBsmtSF > 6000] <- mean(train_test$TotalBsmtSF[train_test$TotalBsmtSF < 6000])
+train_test$X1stFlrSF[train_test$X1stFlrSF > 4000] <- mean(train_test$X1stFlrSF[train_test$X1stFlrSF < 4000])
 ```
+
+```{r}
+# Split the combined transformed dataset into train and test.
+data_train <- train_test[train_test$RecType.Train == 1, ]
+data_test <- train_test[train_test$RecType.Train == 0, ]
+
+# remove id and train/test flag variables from train dataset
+data_train <- subset(data_train, select = -c(Id, RecType.Test))
+
+# remove SalePrice variables from test dataset
+data_test <- subset(data_test, select = -c(SalePrice, RecType.Test))
+```
+
+
 
 #Model 1: Taking all the variables:
 
 
 ```{r}
-model1 <- lm(SalePrice ~ ., data = train)
+model1 <- lm(SalePrice ~ ., data = data_train)
 summary(model1)
 ```
+
+R-squared is 0.93, This means 93% variance of the sale price can be explained by predictor variables in the model. F-statistic is 66.65 with 1206 of degree of freedom and p-value is also very small.
 
 Model 2: Taking only the variables whoes P <.05.
 
@@ -924,9 +952,40 @@ model2 <- lm(SalePrice ~ LotArea + OverallQual + OverallCond + YearBuilt + MasVn
                RoofMatl.CompShg  + RoofMatl.Tar.Grv +  RoofMatl.WdShake + ExterQual.Gd + ExterQual.TA + BsmtQual.Gd + BsmtQual.TA +
                BsmtExposure.Gd + BsmtExposure.No  + KitchenQual.Fa + KitchenQual.Gd + KitchenQual.TA + 
                Functional.Typ  + GarageQual.Fa +  GarageQual.Gd + GarageQual.Po + GarageQual.TA + GarageCond.Fa +
-               GarageCond.Gd + GarageCond.Po + GarageCond.TA + PoolQC.Fa + PoolQC.Gd + PoolQC.None, data = train)
+               GarageCond.Gd + GarageCond.Po + GarageCond.TA + PoolQC.Fa + PoolQC.Gd + PoolQC.None, data = data_train)
 summary(model2)
 ```
+
+
+This model did not give any performance improvement. R-squared is 0.91, This means 91% variance of the sale price can be explained by predictor variables in the model. F-statistic is 249.2 with 1402 of degree of freedom and p-value remains the same.
+
+#Prediction:
+
+
+```{r}
+predictedData_model1 <- data_test
+predictedData_model2 <- Data_test
+# modelColumns <- colnames(HouseDF) testDF_model <-
+# testData[,colnames(testData) %in% modelColumns]
+
+predictedData_model1$salePrice <- predict(model1, data_test)
+predictedData_model2$salePrice <- predict(model2, Data_test)
+
+Id <- data_test$Id
+# Kaggle dataset for model1
+salePrice <- predictedData_model1$salePrice
+kaggleData_modelDF <- data.frame(cbind(Id, salePrice))
+kaggleData_modelDF[is.na(kaggleData_modelDF)] <- 0
+# write.csv(kaggleData_modelDF,'kaggleData_model.csv')
+
+# Kaggle dataset for model2
+salePrice <- predictedData_model2$salePrice
+kaggleData_modelDF2 <- data.frame(cbind(Id, salePrice))
+kaggleData_modelDF2[is.na(kaggleData_modelDF2)] <- 0
+
+```
+
+
 
 
 
