@@ -223,7 +223,7 @@ labs(title ='Scatter Plot of Gross living area vs Sale price') + theme(plot.titl
 ```
 
 Scatter plot for Masonry veneer area in square feet and  scale price
-
+ 
 ```{r}
 ggplot(train, aes(x=MasVnrArea, y=SalePrice)) + geom_jitter(color='seagreen4') + theme_classic() + 
 labs(title ='Scatter Plot of Masonry veneer area vs Sale price') + theme(plot.title = element_text(hjust = 5000)) 
